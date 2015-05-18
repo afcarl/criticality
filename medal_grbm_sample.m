@@ -4,7 +4,7 @@ addpath(genpath('medal'))
 % PREPROCESSING
 
 % load images, construct 32x32 patches
-images = loadimagepatches('BSR\BSDS500\data\images\train',32,32);
+images = loadimagepatches('BSR/BSDS500/data/images/train',32,32);
 images = permute(images, [3,1,2]);
 images = reshape(images, size(images,1), size(images, 2) * size(images, 3));
 images = bsxfun(@minus, double(images), mean(images));
