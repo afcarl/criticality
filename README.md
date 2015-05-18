@@ -14,7 +14,8 @@ Then run `medal_grbm_sample.m`. This should produce following figures:
 **Figure 1: example patches**
 ![](https://github.com/tambetm/criticality/blob/master/images/example_patches.png)
 
-**Figure 2: training statistics (not shown)**
+**Figure 2: training statistics**
+![](https://github.com/tambetm/criticality/blob/master/images/medal_grbm_training.png)
 
 **Figure 3: filters after training**
 ![](https://github.com/tambetm/criticality/blob/master/images/medal_grbm_filters.png)
