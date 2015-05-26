@@ -71,65 +71,80 @@ title('Reconstruction from hidden unit probabilities');
 
 % SAMPLING
 
+% plot variances of changes for detecting burn-in
+numsamples = 100;
+burnin = 0;
+thinning = 1;
+range = 2:-0.5:-2;
+temperatures = 10.^range;
+figure;
+for i = 1:length(temperatures)
+    t = temperatures(i);
+    disp(['temperature = ' num2str(t)])
+    [energy_samples, r] = sample_energies(r, t, numsamples, burnin, thinning, false, false);
+    subplot(3, 3, i);
+    plot(var(energy_samples, 0, 1));
+    title(['Variance of chains at temperature ' num2str(t)]);
+    xlabel('Iteration');
+    ylabel('Variance of chains');
+    drawnow;
+end
+
+% plot autocorrelations
+numsamples = 1000;
+burnin = 20;
+thinning = 1;
+range = 2:-0.5:-2;
+temperatures = 10.^range;
+figure;
+for i = 1:length(temperatures)
+    t = temperatures(i);
+    disp(['temperature = ' num2str(t)])
+    energy_samples = sample_energies(r, t, numsamples, burnin, thinning, false, false);
+    subplot(3, 3, i);
+    acf(energy_samples(1, :)', 20);
+    title(['Autocorrelations at temperature ' num2str(t)]);
+    drawnow;
+end
+
 % sample 1000 times from each initial state, after discarding first 100
 % number of initial states (independent chains) is determined by batch size
-numsamples = 100;
-burnin = 10;
+numsamples = 1000;
+burnin = 20;
+thinning = 1;
+video = false;
 energy_variances = [];
-
-% create video file
-video = VideoWriter('grbm.avi');
-video.FrameRate = 25;
-open(video);
+   
+if video
+    % create video file
+    video = VideoWriter('grbm.avi');
+    video.FrameRate = 25;
+    open(video);
+end
 
 % keep figure open
-figure;
-hold on;
+fig = figure;
 
 % temperature range, in powers of 10
-range = 2:-0.1:-2;
+range = 2:-0.5:-2;
 temperatures = 10.^range;
 for t = temperatures;
     disp(['temperature = ' num2str(t)])
-    energy_samples = [];
-    for j=1:(burnin + numsamples)
-        % sample visible nodes from hidden nodes
-        r = r.visGivHid(r.aHid, 1, t);
-        % sample hidden nodes from visible nodes
-        r = r.hidGivVis(r.aVis, 0, 1, t);
-        % visualize sample
-        img = mat2gray(myvisualize(r.aVis', 10)');
-        imgsize = size(img);
-        img = insertText(img, [imgsize(1)/2 imgsize(2)], ...
-            strcat('Temperature: ', num2str(t)), ...
-            'AnchorPoint','CenterBottom');
-        % show image on screen
-        imshow(img);
-        % write image to video file
-        writeVideo(video, img)
-        
-        if j > burnin
-            % calculate energy of this configuration
-            energy = sum(bsxfun(@minus, r.aVis, r.b).^2, 2) ./ 2 ...
-                - sum(bsxfun(@times, r.aHid, r.c), 2) ...
-                - sum((r.aVis * r.W) .* r.aHid, 2);
-            % collect energies for variance calculation
-            energy_samples = [energy_samples energy];
-        end
-    end
+    [energy_samples, r] = sample_energies(r, t, numsamples, burnin, thinning, fig, video);
     energy_variances = [energy_variances mean(var(energy_samples, 0, 2))];
 end
-close(video)
+if video
+    close(video)
+end
 
 % plot energy variance vs temperature
 figure;
 loglog(temperatures, energy_variances)
 xlabel('temperature')
-ylabel('var(energy)')
+ylabel('var(E)')
 
 % plot heat capacity vs temperature
 figure;
 semilogx(temperatures, energy_variances ./ (temperatures .^ 2))
 xlabel('temperature')
-ylabel('var(energy)/(temperature^2)')
-
+ylabel('var(E)/(T^2)')
