@@ -5,7 +5,7 @@ function [ energy_samples, r ] = sample_energies(r, t, numsamples, burnin, thinn
         % sample visible nodes from hidden nodes
         r = r.visGivHid(r.aHid, 1, t);
         % sample hidden nodes from visible nodes
-        r = r.hidGivVis(r.aVis, 0, 0, t);
+        r = r.hidGivVis(r.aVis, 0, 1, t);
         
         % discard first samples as burn-in
         if j > burnin

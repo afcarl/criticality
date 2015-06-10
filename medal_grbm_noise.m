@@ -107,11 +107,10 @@ end
 
 % sample 1000 times from each initial state, after discarding first 100
 % number of initial states (independent chains) is determined by batch size
-numsamples = 1000;
-burnin = 100;
+numsamples = 100;
+burnin = 10;
 thinning = 1;
 video = false;
-energy_variances = [];
    
 if video
     % create video file
@@ -126,6 +125,7 @@ fig = figure;
 % temperature range, in powers of 10
 range = 2:-0.5:-2;
 temperatures = 10.^range;
+energy_variances = [];
 for t = temperatures;
     disp(['temperature = ' num2str(t)])
     [energy_samples, r] = sample_energies(r, t, numsamples, burnin, thinning, fig, video);
