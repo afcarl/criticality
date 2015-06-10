@@ -17,7 +17,7 @@ function [ energy_samples, r ] = sample_energies(r, t, numsamples, burnin, thinn
             energy_samples = [energy_samples energy];
         end
 
-        if fig
+        if ishandle(fig)
             % visualize sample
             img = mat2gray(myvisualize(r.aVis', 10)');
             imgsize = size(img);
